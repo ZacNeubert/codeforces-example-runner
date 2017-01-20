@@ -34,8 +34,8 @@ def get_examples(contest_id, problem_code):
     html = requests.get(url).text
 
     soup = BeautifulSoup(html, 'lxml')
-    inputs = [chowder.find('pre').text for chowder in soup.findAll('div', attrs={'class': 'input'})]
-    outputs = [chowder.find('pre').text for chowder in soup.findAll('div', attrs={'class': 'output'})]
+    inputs = ['\n'.join(chowder.find('pre').strings) for chowder in soup.findAll('div', attrs={'class': 'input'})]
+    outputs = ['\n'.join(chowder.find('pre').strings) for chowder in soup.findAll('div', attrs={'class': 'output'})]
 
     return list(zip(inputs, outputs))
 
@@ -51,6 +51,7 @@ script = args.script
 examples = get_examples(args.contest_id, args.problem_code)
 
 for i,t in enumerate(examples):
+    i+=1
     key = t[0]
     val = t[1]
     proc = Popen(['python3', script], stdout=PIPE, stderr=PIPE, stdin=PIPE)
@@ -64,6 +65,6 @@ for i,t in enumerate(examples):
         print('Generated:', out)
         print('Actual:   ', val)
         if val != out or err:
-            p.printRed('Example {}: FAILURE\n {} should be {}'.format(i, out, val), err)
+            p.printRed('Example {}: FAILURE\n{}'.format(i, err))
         else:
-            p.printRed('SOMETHING WEIRD HAPPENED', out, err)
+            p.printRed('SOMETHING WEIRD HAPPENED {} {}'.format(out, err))
