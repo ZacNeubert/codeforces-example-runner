@@ -6,28 +6,27 @@ from subprocess import PIPE, Popen
 import requests
 from bs4 import BeautifulSoup
 
-class p:
-    class bcolors:
-        HEADER = '\033[95m'
-        OKBLUE = '\033[94m'
-        OKGREEN = '\033[92m'
-        WARNING = '\033[93m'
-        FAIL = '\033[91m'
-        ENDC = '\033[0m'
-        BOLD = '\033[1m'
-        UNDERLINE = '\033[4m'
+class colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-    @staticmethod
-    def printRed(string):
-        print(p.bcolors.FAIL + string + p.bcolors.ENDC)
+def print_color(string, colorcode):
+    print(colorcode + string + colors.ENDC)
 
-    @staticmethod
-    def printYellow(string):
-        print(p.bcolors.WARNING + string + p.bcolors.ENDC)
+def print_red(string):
+    print_color(string, colors.RED)
 
-    @staticmethod
-    def printGreen(string):
-        print(p.bcolors.OKGREEN + string + p.bcolors.ENDC)
+def print_yellow(string):
+    print_color(string, colors.YELLOW)
+
+def print_green(string):
+    print_color(string, colors.GREEN)
 
 def get_examples(contest_id, problem_code):
     url = 'http://www.codeforces.com/contest/{}/problem/{}'.format(args.contest_id, args.problem_code)
@@ -59,12 +58,12 @@ for i,t in enumerate(examples):
     out = out.decode('utf8')[:-1]
     err = err.decode('utf8')[:-1]
     if val == out:
-        p.printGreen('Example {}: SUCCESS'.format(i))
+        print_green('Example {}: SUCCESS'.format(i))
     else:
         print('Input: ',key)
         print('Generated:', out)
         print('Actual:   ', val)
         if val != out or err:
-            p.printRed('Example {}: FAILURE\n{}'.format(i, err))
+            print_red('Example {}: FAILURE\n{}'.format(i, err))
         else:
-            p.printRed('SOMETHING WEIRD HAPPENED {} {}'.format(out, err))
+            print_red('SOMETHING WEIRD HAPPENED {} {}'.format(out, err))
