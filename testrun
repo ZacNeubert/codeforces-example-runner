@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
-from subprocess import PIPE, Popen
-
 import requests
 from bs4 import BeautifulSoup
+from subprocess import PIPE, Popen
+
 
 class colors:
     HEADER = '\033[95m'
@@ -51,19 +51,19 @@ examples = get_examples(args.contest_id, args.problem_code)
 
 for i,t in enumerate(examples):
     i+=1
-    key = t[0]
-    val = t[1]
+    ex_input = t[0]
+    ex_out = t[1]
     proc = Popen(['python3', script], stdout=PIPE, stderr=PIPE, stdin=PIPE)
-    out, err = proc.communicate(key.encode('utf8'))
-    out = out.decode('utf8')[:-1]
+    gen_out, err = proc.communicate(ex_input.encode('utf8'))
+    gen_out = gen_out.decode('utf8')[:-1]
     err = err.decode('utf8')[:-1]
-    if val == out:
+    if ex_out == gen_out:
         print_green('Example {}: SUCCESS'.format(i))
     else:
-        print('Input: ',key)
-        print('Generated:', out)
-        print('Actual:   ', val)
-        if val != out or err:
-            print_red('Example {}: FAILURE\n{}'.format(i, err))
+        print(ex_input)
+        print('Generated:', gen_out)
+        print('Actual:   ', ex_out)
+        if err:
+            print_red('Example {}: ERROR OCCURRED\n{}'.format(i, err))
         else:
-            print_red('SOMETHING WEIRD HAPPENED {} {}'.format(out, err))
+            print_red('Example {}: FAILURE'.format(i))
