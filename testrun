@@ -1,0 +1,69 @@
+#!/usr/bin/python3
+
+import argparse
+from subprocess import PIPE, Popen
+
+import requests
+from bs4 import BeautifulSoup
+
+class p:
+    class bcolors:
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+
+    @staticmethod
+    def printRed(string):
+        print(p.bcolors.FAIL + string + p.bcolors.ENDC)
+
+    @staticmethod
+    def printYellow(string):
+        print(p.bcolors.WARNING + string + p.bcolors.ENDC)
+
+    @staticmethod
+    def printGreen(string):
+        print(p.bcolors.OKGREEN + string + p.bcolors.ENDC)
+
+def get_examples(contest_id, problem_code):
+    url = 'http://www.codeforces.com/contest/{}/problem/{}'.format(args.contest_id, args.problem_code)
+    html = requests.get(url).text
+
+    soup = BeautifulSoup(html, 'lxml')
+    inputs = [chowder.find('pre').text for chowder in soup.findAll('div', attrs={'class': 'input'})]
+    outputs = [chowder.find('pre').text for chowder in soup.findAll('div', attrs={'class': 'output'})]
+
+    return list(zip(inputs, outputs))
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('contest_id', type=str)
+parser.add_argument('problem_code', type=str)
+parser.add_argument('script', type=str)
+args = parser.parse_args()
+
+script = args.script
+
+examples = get_examples(args.contest_id, args.problem_code)
+
+for i,t in enumerate(examples):
+    key = t[0]
+    val = t[1]
+    proc = Popen(['python3', script], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    out, err = proc.communicate(key.encode('utf8'))
+    out = out.decode('utf8')[:-1]
+    err = err.decode('utf8')[:-1]
+    if val == out:
+        p.printGreen('Example {}: SUCCESS'.format(i))
+    else:
+        print('Input: ',key)
+        print('Generated:', out)
+        print('Actual:   ', val)
+        if val != out or err:
+            p.printRed('Example {}: FAILURE\n {} should be {}'.format(i, out, val), err)
+        else:
+            p.printRed('SOMETHING WEIRD HAPPENED', out, err)
