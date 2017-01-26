@@ -59,6 +59,7 @@ for i,t in enumerate(examples):
     err = err.decode('utf8')[:-1]
     if ex_out == gen_out:
         print_green('Example {}: SUCCESS'.format(i))
+        print_green('Solution: {}'.format(gen_out))
     else:
         print(ex_input)
         print('Generated:', gen_out)
