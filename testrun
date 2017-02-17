@@ -53,13 +53,17 @@ for i,t in enumerate(examples):
     i+=1
     ex_input = t[0]
     ex_out = t[1]
-    proc = Popen(['python3', script], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    proc = Popen(['python3', script, '-v'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
     gen_out, err = proc.communicate(ex_input.encode('utf8'))
     gen_out = gen_out.decode('utf8')[:-1]
     err = err.decode('utf8')[:-1]
     if ex_out == gen_out:
         print_green('Example {}: SUCCESS'.format(i))
         print_green('Solution: {}'.format(gen_out))
+    elif ex_out == gen_out.split('\n')[-1]:
+        print_yellow('Example {}: LAST LINE CORRECT'.format(i))
+        print_yellow('Solution: {}'.format(gen_out))
+        print_yellow('Actual: {}'.format(ex_out))
     else:
         print(ex_input)
         print('Generated:', gen_out)
